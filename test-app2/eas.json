@@ -1,6 +1,6 @@
 {
   "build": {
-    "appdobarroso": {
+    "ytdl-to-mp3": {
       "android": {
         "buildType": "apk"
       }

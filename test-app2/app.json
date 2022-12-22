@@ -28,14 +28,24 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Allow YTDLtoMP3 to access your photos.",
+        "NSPhotoLibraryAddUsageDescription": "Allow YTDLtoMP3 to save photos."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "permissions": ["WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE"],
+      "permissions": [
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_MEDIA_LOCATION"
+      ],
       "package": "com.rbarrosodev.testapp"
     },
     "web": {
@@ -43,7 +53,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "841f253f-596e-464d-91fd-b9cff4cbf8f4"
+        "projectId": "74fe4a1d-581d-4d5a-89f2-02ae5d714956"
       }
     },
     "owner": "rbarrosodev"

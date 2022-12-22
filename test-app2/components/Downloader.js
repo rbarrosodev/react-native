@@ -74,9 +74,16 @@ export default class Downloader extends Component {
           if (status === "granted") {
             console.log("Finalizado");
             const asset = await MediaLibrary.createAssetAsync(fileUri)
-            this.setState({uri: fileUri});
             this.setState({bgButtonColor: '#228C22'})
             this.setState({buttonText: 'Finalizado'})
+            this.setState({inputText: ''})
+
+            setTimeout(() => {
+              this.setState({buttonStatus: false})
+              this.setState({bgButtonColor: '#0000ff'})
+              this.setState({buttonText: 'Baixar'})
+              this.setState({downloadProgress: 'reset'})
+            }, '5000')
           } else {
             console.log("Falha no download");
           }
