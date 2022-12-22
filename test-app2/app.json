@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "test-app",
-    "slug": "test-app",
+    "name": "YTDLtoMP3",
+    "slug": "ytdl-to-mp3",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,8 +18,8 @@
       [
         "expo-media-library",
         {
-          "photosPermission": "Allow testapp to access your photos.",
-          "savePhotosPermission": "Allow testapp to save photos.",
+          "photosPermission": "Allow YTDLtoMP3 to access your photos.",
+          "savePhotosPermission": "Allow YTDLtoMP3 to save photos.",
           "isAccessMediaLocationEnabled": true
         }
       ]
