@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, PermissionsAndroid } from 'react-native';
+import { Text, View, StyleSheet, TextInput } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 import * as Permissions from 'expo-permissions';
+import ytdl from 'react-native-ytdl'
 import Button from './Button';
 
 
@@ -12,16 +13,53 @@ export default class Downloader extends Component {
         this.state = {
           url: '',
           buttonStatus: false,
-          bgButtonColor: '#0000ff'
-        }
+          bgButtonColor: '#0000ff',
+          buttonText: 'Baixar',
+          inputText: ''
+        };
     }
 
-    downloadFile(){
+    handleVideoInput = (text) => {
+      this.setState({inputText: text})
+    }
+
+    downloadFromYt = async (youtubeUrl) => {
+      this.setState({bgButtonColor: '#F6BE00'})
+      this.setState({buttonText: 'Aguarde'})
+      const url = await ytdl(youtubeUrl, { quality: 'highestaudio' });
+      const info = await ytdl.getBasicInfo(youtubeUrl);
+      const uri = url[0]['url']
+      const title = info['videoDetails']['title']
+
+
+      const file = await FileSystem.getInfoAsync(FileSystem.documentDirectory + title + '.mp3');
+      if (file.exists) {
+        this.setState({bgButtonColor: '#F6BE00'})
+        this.setState({buttonText: 'Arquivo já existe'})
+      }
+      else {
         this.setState({buttonStatus: true})
         this.setState({bgButtonColor: '#ff0000'})
-        const uri = "https://file-examples.com/storage/fe42c8472a63a1f029d7e90/2017/04/file_example_MP4_1920_18MG.mp4"
-        let fileUri = FileSystem.documentDirectory + "earth.mp4";
-        FileSystem.downloadAsync(uri, fileUri)
+        this.setState({buttonText: 'Baixando...'})
+        this.downloadFile(uri, title)
+      }
+    }
+
+    downloadFile(uri, title){
+        const callback = downloadProgress => {
+          const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+          this.setState({
+            downloadProgress: progress,
+          });
+        };
+
+        const downloadResumable = FileSystem.createDownloadResumable(
+          uri,
+          FileSystem.documentDirectory + title + '.mp3',
+          {},
+          callback
+        );
+        downloadResumable.downloadAsync()
         .then(({ uri }) => {
             this.saveFile(uri);
           })
@@ -34,11 +72,13 @@ export default class Downloader extends Component {
         try {
           const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
           if (status === "granted") {
-            console.log("Autorizado");
+            console.log("Finalizado");
             const asset = await MediaLibrary.createAssetAsync(fileUri)
             this.setState({uri: fileUri});
+            this.setState({bgButtonColor: '#228C22'})
+            this.setState({buttonText: 'Finalizado'})
           } else {
-            console.log("Não autorizado");
+            console.log("Falha no download");
           }
         } catch (err) {
           console.warn(err);
@@ -48,10 +88,13 @@ export default class Downloader extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Button label={'clique aqui'} action={() => this.downloadFile()} disable={this.state.buttonStatus} bgColor={this.state.bgButtonColor}></Button>
+                <Text style={styles.header}>
+                  Youtube Downloader to MP3
+                </Text>
+                <TextInput style={styles.input} onChangeText={this.handleVideoInput} placeholder="Insira o link aqui"/>
+                <Button label={this.state.buttonText} action={() => this.downloadFromYt(this.state.inputText)} disable={this.state.buttonStatus} bgColor={this.state.bgButtonColor}></Button>
                 <Text style={styles.paragraph}>
-                Path: 
-                {this.state.uri}
+                {isNaN(Math.round(this.state.downloadProgress * 100)) ? '' : 'Progresso: ' + Math.round(this.state.downloadProgress * 100) + '%' }
                 </Text>
             </View>
         );
@@ -65,6 +108,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#ecf0f1',
   },
+  header: {
+    fontSize: 26,
+    marginBottom: 30,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#000',
+  },
   paragraph: {
     margin: 24,
     fontSize: 18,
@@ -72,4 +122,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#34495e',
   },
+  input: {
+    width: 200,
+    height: 50,
+    marginBottom: 20,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 10,
+    textAlign: 'center'
+  }
 });
